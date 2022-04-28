@@ -14,29 +14,9 @@ public class CommunityExceptionHandler {
 	@ExceptionHandler
 	public ResponseEntity<CommunityErrorResponse> handleException(CommunityNotFoundException exception)
 	{
+		//Create ErrorResponse Object
 		CommunityErrorResponse error = new CommunityErrorResponse();
-		error.setStatus(HttpStatus.NOT_FOUND.value());
-		error.setMessage(exception.getMessage());
-		error.setTimeStamp(LocalDateTime.now());
-		
-		return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
-	}
-	
-	@ExceptionHandler
-	public ResponseEntity<CommunityErrorResponse> handleException(CommunityFoundException exception)
-	{
-		CommunityErrorResponse error = new CommunityErrorResponse();
-		error.setStatus(HttpStatus.NOT_FOUND.value());
-		error.setMessage(exception.getMessage());
-		error.setTimeStamp(LocalDateTime.now());
-		
-		return new ResponseEntity<>(error,HttpStatus.UNPROCESSABLE_ENTITY);
-	}
-	
-	@ExceptionHandler
-	public ResponseEntity<CommunityErrorResponse> handleException(ComDescriptionNotFoundException exception)
-	{
-		CommunityErrorResponse error = new CommunityErrorResponse();
+		//Set error Status,Message,TimeStamp
 		error.setStatus(HttpStatus.NOT_FOUND.value());
 		error.setMessage(exception.getMessage());
 		error.setTimeStamp(LocalDateTime.now());

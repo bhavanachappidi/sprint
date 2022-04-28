@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.casestudy.blogging.bean.Community;
+import com.casestudy.blogging.dto.CommunityInputDto;
 
 @SpringBootTest
 public class CommunityServiceTest {
@@ -19,11 +20,11 @@ public class CommunityServiceTest {
 	ICommunityService comServ;
 	
 	@Test
-//	@Disabled
+	@Disabled
 	void addCommunityTest()
 	{
 		//Create community object
-		Community com = new Community();
+		CommunityInputDto com = new CommunityInputDto();
 		com.setCommunityId(1);
 		com.setCommunityDescription("Humans");
 		com.setTotalMembers(120);
@@ -77,11 +78,11 @@ public class CommunityServiceTest {
 	}
 	
 	@Test
-//	@Disabled
+	@Disabled
 	void updateCommunityTest()
 	{
-		Community com = new Community();
-		com.setCommunityId(280);
+		CommunityInputDto com = new CommunityInputDto();
+		com.setCommunityId(411);
 		com.setCommunityDescription("World");
 		com.setTotalMembers(120);
 		com.setOnlineMembers(110);
@@ -122,7 +123,7 @@ public class CommunityServiceTest {
 		Community c = comServ.updateCommunity(com);
 		
 		//Validate details
-		assertEquals(280,c.getCommunityId());
+		assertEquals(411,c.getCommunityId());
 		assertEquals("World",c.getCommunityDescription());
 		assertEquals(120,c.getTotalMembers());
 		assertEquals(110,c.getOnlineMembers());
@@ -135,14 +136,14 @@ public class CommunityServiceTest {
 	}
 	
 	@Test
-//	@Disabled
+	@Disabled
 	void deleteCommunityTest()
 	{	
 		//Count before Delete operation
 		long beforeDeletecount = comServ.count();
 		
 		//Delete the community
-		Community c = comServ.deleteCommunity(281);
+		comServ.deleteCommunity(411);
 		
 		//Count after delete operation
 		long afterDeleteCount = comServ.count();
@@ -151,13 +152,20 @@ public class CommunityServiceTest {
 		assertEquals(beforeDeletecount,afterDeleteCount+1);
 		
 	}
-	
 	@Test
-//	@Disabled
+	@Disabled
 	void listAllCommunitiesTest()
 	{
-		List<Community> comList = comServ.listAllCommunities("Science");
+		List<Community> comList = comServ.listAllCommunities();
+		assertEquals(1,comList.size());
+	}
+	
+	@Test
+	@Disabled
+	void listAllCommunitiesByDescriptionTest()
+	{
+		List<Community> comList = comServ.listAllCommunitiesByDescription("Science");
 		int noOfCommunities = comList.size();
-		assertEquals(3,noOfCommunities);
+		assertEquals(1,noOfCommunities);
 	}
 }

@@ -7,75 +7,122 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.casestudy.blogging.bean.Community;
-import com.casestudy.blogging.exception.ComDescriptionNotFoundException;
-import com.casestudy.blogging.exception.CommunityFoundException;
+import com.casestudy.blogging.dto.CommunityInputDto;
 import com.casestudy.blogging.exception.CommunityNotFoundException;
 import com.casestudy.blogging.repository.ICommunityRepository;
+
 @Service
 public class CommunityServiceImpl implements ICommunityService {
-	
+
 	@Autowired
 	ICommunityRepository comRepo;
 
 	@Override
-	public Community addCommunity(Community community) {
-		//Check whether community is already present in DB or not
-		Optional<Community> opt = comRepo.findById(community.getCommunityId());
-		if(opt.isPresent())
-		{
-			throw new CommunityFoundException("Community is already present with the given id: "+community.getCommunityId());
-		}
-		//Saving Community Object to Repository
-		Community com = comRepo.save(community);
+	public Community addCommunity(CommunityInputDto community) {
+
+		// Create community object
+		Community newCommunity = new Community();
+		
+		//Set values to Community object
+		newCommunity.setCommunityDescription(community.getCommunityDescription());
+		newCommunity.setTotalMembers(community.getTotalMembers());
+		newCommunity.setOnlineMembers(community.getOnlineMembers());
+		newCommunity.setImage(community.getImage());
+		newCommunity.setCreatedOn(community.getCreatedOn());
+		newCommunity.setPostRulesAllowed(community.getPostRulesAllowed());
+		newCommunity.setPostRulesDisAllowed(community.getPostRulesDisAllowed());
+		newCommunity.setBanningPolicy(community.getBanningPolicy());
+		newCommunity.setFlairs(community.getFlairs());
+		
+		// Saving Community Object to Repository
+		Community com = comRepo.save(newCommunity);
 		return com;
 	}
 
 	@Override
-	public Community updateCommunity(Community community) {
-		//Check whether community is available in DB or not by using Id
+	public Community updateCommunity(CommunityInputDto community) {
+		// Check whether community is available in DB or not by using Id
 		Optional<Community> opt = comRepo.findById(community.getCommunityId());
-		if(!opt.isPresent())
-		{
-			throw new CommunityNotFoundException("Community not found with the given id:"+community.getCommunityId());
+		if (!opt.isPresent()) {
+			throw new CommunityNotFoundException("Community not found with the given id:" + community.getCommunityId());
 		}
-		//Save Updated Community to repository
-		return comRepo.save(community);
+		//Get the community from database
+		Community newCommunity = opt.get();
+		
+		//Update with new values
+		newCommunity.setCommunityDescription(community.getCommunityDescription());
+		newCommunity.setTotalMembers(community.getTotalMembers());
+		newCommunity.setOnlineMembers(community.getOnlineMembers());
+		newCommunity.setImage(community.getImage());
+		newCommunity.setCreatedOn(community.getCreatedOn());
+		newCommunity.setPostRulesAllowed(community.getPostRulesAllowed());
+		newCommunity.setPostRulesDisAllowed(community.getPostRulesDisAllowed());
+		newCommunity.setBanningPolicy(community.getBanningPolicy());
+		newCommunity.setFlairs(community.getFlairs());
+		
+		// Save Updated Community to repository
+		Community com = comRepo.save(newCommunity);
+		return com;
 	}
 
 	@Override
-	public Community deleteCommunity(int comId) {
-		//Check whether community is available in DB or not by using Id
+	public void deleteCommunity(int comId) {
+		// Check whether community is available in DB or not by using Id
 		Optional<Community> opt = comRepo.findById(comId);
-		if(!opt.isPresent())
-		{
-			throw new CommunityNotFoundException("Community not found with the given id:"+comId);
-		}
-		//Delete Community
 		
+		if (!opt.isPresent()) {
+			throw new CommunityNotFoundException("Community not found with the given id:" + comId);
+		}
+		
+		// Delete Community
 		Community deletedCommunity = opt.get();
 		comRepo.delete(deletedCommunity);
-		
-		return deletedCommunity;
 	}
 
 	@Override
-	public List<Community> listAllCommunities(String searchString) {
-//		
-//		Optional<List<Community>> opt = comRepo.findByCommunityDescription(searchString);
-//		if(opt.isPresent() && opt.get().isEmpty())
-//		{
-//			throw new ComDescriptionNotFoundException("Community is not found with the given description : "+searchString);
-//		}
-//		
-		//Get list of communities with same CommunityDescription
-		List<Community> comList = comRepo.listAllCommunities(searchString);
+	public List<Community> listAllCommunities() {
+		List<Community> comList= comRepo.findAll();
 		
+		if(comList.isEmpty()) {
+			throw new CommunityNotFoundException("No community is found");
+		}
+				
 		return comList;
 	}
 
 	@Override
+	public List<Community> listAllCommunitiesByDescription(String communityDescription) {
+		String description = '%' + communityDescription + '%';
+		// Creating a list of PostOutputDto
+		List<Community> allCommunities = comRepo.listAllCommunitiesByDescription(description);
+				
+		if(allCommunities.isEmpty()) {
+			throw new CommunityNotFoundException("No community with description: " + communityDescription);
+		}
+		return allCommunities;
+	}
+
+
+	@Override
 	public long count() {
 		return comRepo.count();
+	}
+
+	@Override
+	public Community addCommunityWithoutDto(Community community) {
+
+		return comRepo.save(community);
+	}
+
+	@Override
+	public Community updateCommunityWithoutDto(Community community) {
+		Optional<Community> opt = comRepo.findById(community.getCommunityId());
+		if (!opt.isPresent()) {
+			throw new CommunityNotFoundException("Community not found with the given id:" + community.getCommunityId());
+		}
+		// Save Updated Community to repository
+		Community com = comRepo.save(community);
+		return com;
 	}
 
 }
